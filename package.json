@@ -12,7 +12,7 @@
   "homepage": "https://github.com/leaf76/device-ui-testing-guidance#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/leaf76/device-ui-testing-guidance.git"
+    "url": "git+https://github.com/leaf76/device-ui-testing-guidance.git"
   },
   "bugs": {
     "url": "https://github.com/leaf76/device-ui-testing-guidance/issues"
@@ -31,7 +31,7 @@
     "node": ">=20.0.0"
   },
   "bin": {
-    "device-ui-testing-guidance": "./bin/device-ui-testing-guidance.mjs"
+    "device-ui-testing-guidance": "bin/device-ui-testing-guidance.mjs"
   },
   "files": [
     "bin/",

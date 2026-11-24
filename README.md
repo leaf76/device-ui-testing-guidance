@@ -27,23 +27,20 @@ While platform authoring skills focus on *how to write* modern HTML/CSS/JS, **De
 Requires **Node.js >= 20**. Zero runtime dependencies are required for `search`, `retrieve`, `list`, and `static-scan`. The `audit` subcommand dynamically loads `playwright` (or `playwright-core`) from your project or `--playwright-from`.
 
 ```sh
-# Run directly from GitHub via npx (or clone and run locally)
-npx -y github:leaf76/device-ui-testing-guidance search "short landscape dialog clipping"
-
-# Search relevant device testing guides (local checkout)
-node bin/device-ui-testing-guidance.mjs search "short landscape dialog clipping"
+# Run directly via npx (zero install required)
+npx -y device-ui-testing-guidance@latest search "short landscape dialog clipping"
 
 # Retrieve one or more guides
-node bin/device-ui-testing-guidance.mjs retrieve "dialogs-and-drawers-on-tight-screens,short-landscape-and-keyboard-guard"
+npx -y device-ui-testing-guidance@latest retrieve "dialogs-and-drawers-on-tight-screens,short-landscape-and-keyboard-guard"
 
-# List all guides
-node bin/device-ui-testing-guidance.mjs list
+# List all 24 guides
+npx -y device-ui-testing-guidance@latest list
 
 # Static-scan CSS/HTML/TSX for responsive pitfalls
-node bin/device-ui-testing-guidance.mjs static-scan ./src --json
+npx -y device-ui-testing-guidance@latest static-scan ./src --json
 
 # Run full 9-viewport headless Playwright audit (light + dark)
-node bin/device-ui-testing-guidance.mjs audit http://127.0.0.1:4173 \
+npx -y device-ui-testing-guidance@latest audit http://127.0.0.1:4173 \
   --preset full \
   --themes light,dark \
   --out ./.audit-out

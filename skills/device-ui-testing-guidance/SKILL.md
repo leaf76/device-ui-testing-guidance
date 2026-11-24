@@ -12,10 +12,13 @@ Systematic guidance and runnable verification tooling for proving that web inter
 
 ## CLI Resolution
 
-Locate the bundled CLI next to this skill (`../../bin/device-ui-testing-guidance.mjs` relative to this `SKILL.md`), or use `npx device-ui-testing-guidance` when installed from npm:
+Run directly via `npx` (published on npm as `device-ui-testing-guidance`), or invoke the bundled offline CLI at `../../bin/device-ui-testing-guidance.mjs` relative to this `SKILL.md`:
 
 ```sh
-# Local plugin install (works offline, Windows/macOS/Linux):
+# Zero-install via npm (Windows: use npx.cmd):
+npx -y device-ui-testing-guidance@latest <subcommand> [args]
+
+# Offline local plugin install (Windows/macOS/Linux):
 node "<plugin-root>/bin/device-ui-testing-guidance.mjs" <subcommand> [args]
 ```
 
@@ -76,7 +79,8 @@ DOM geometry checks catch objective regressions, but **cannot replace visual ins
 
 ## Non-Negotiable Testing Invariants
 
-- **Never trust `documentElement.scrollWidth` alone**: Always combine it with visible element `getBoundingClientRect().right <= innerWidth + 1.5` clipping scans (excluding closed `<dialog>` and intentional scroll containers).
+- **Never trust `documentElement.scrollWidth` alone**: Always combine it with visible element `getBoundingClientRect().right <= Math.min(window.innerWidth, expectedWidth) + 1.5` clipping scans (excluding closed `<dialog>` and intentional scroll containers).
+- **Guard against mobile shrink-to-fit inflation**: Under Playwright `isMobile: true`, overflowing content can inflate `window.innerWidth` beyond the requested device width; always assert against `Math.min(window.innerWidth, expectedWidth)` in addition to `documentElement.scrollWidth`.
 - **Always emulate touch on mobile/tablet viewports**: Use `isMobile: true, hasTouch: true` so `@media (pointer: coarse)` rules actually activate.
 - **Protect portrait virtual keyboards**: Never write bare `@media (orientation: landscape)` for phone multi-column layouts without pairing `max-height: 500px` and `min-width: 560px`.
 - **Keep mobile inputs zoom-safe**: Every interactive `<input>`, `<select>`, and `<textarea>` on mobile MUST compute to `font-size >= 16px` (check higher-specificity class overrides too).

@@ -1,0 +1,15 @@
+{
+  "name": "device-ui-testing-guidance-marketplace",
+  "description": "Device adaptation, multi-viewport responsiveness, and real-world frontend UI/UX testing guidance for coding agents.",
+  "owner": {
+    "name": "leaf76"
+  },
+  "plugins": [
+    {
+      "name": "device-ui-testing-guidance",
+      "source": "./",
+      "description": "Structured multi-device frontend testing guidance, CSS/HTML static pitfall scanner, and 9-viewport headless Playwright auditor.",
+      "version": "1.0.0"
+    }
+  ]
+}

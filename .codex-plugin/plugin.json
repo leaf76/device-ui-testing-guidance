@@ -1,0 +1,38 @@
+{
+  "name": "device-ui-testing-guidance",
+  "version": "1.0.0",
+  "description": "Structured multi-device frontend testing guidance, CSS/HTML static pitfall scanner, and 9-viewport headless Playwright auditor.",
+  "author": {
+    "name": "leaf76",
+    "url": "https://github.com/leaf76"
+  },
+  "homepage": "https://github.com/leaf76/device-ui-testing-guidance",
+  "repository": "https://github.com/leaf76/device-ui-testing-guidance",
+  "license": "MIT",
+  "keywords": [
+    "responsive",
+    "rwd",
+    "playwright",
+    "mobile",
+    "frontend-testing"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Device UI Testing Guidance",
+    "shortDescription": "Multi-device frontend UI/UX testing guidance & auditor",
+    "longDescription": "An agent skill, modular testing knowledge base, static CSS/HTML pitfall scanner, and headless 9-viewport Playwright auditor covering mobile portrait/landscape, split-screen, touch ergonomics, overlays, adversarial data, and bilingual/theme resilience.",
+    "developerName": "leaf76",
+    "category": "Developer Tools",
+    "composerIcon": "./assets/logo.svg",
+    "logo": "./assets/logo.svg",
+    "capabilities": [
+      "Read"
+    ],
+    "websiteURL": "https://github.com/leaf76/device-ui-testing-guidance",
+    "supportURL": "https://github.com/leaf76/device-ui-testing-guidance/issues",
+    "defaultPrompt": [
+      "Audit this frontend URL across all 9 mobile, tablet, and desktop viewports for clipping, crowding, and touch issues",
+      "Static-scan our stylesheets for responsive design anti-patterns before shipping"
+    ]
+  }
+}

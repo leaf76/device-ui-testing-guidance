@@ -1,0 +1,28 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "device-ui-testing-guidance",
+  "displayName": "Device UI Testing Guidance",
+  "version": "1.0.0",
+  "description": "Structured multi-device frontend testing guidance, CSS/HTML static pitfall scanner, and 9-viewport headless Playwright auditor for real-world responsive UI/UX verification.",
+  "author": {
+    "name": "leaf76",
+    "url": "https://github.com/leaf76"
+  },
+  "homepage": "https://github.com/leaf76/device-ui-testing-guidance",
+  "repository": "https://github.com/leaf76/device-ui-testing-guidance",
+  "license": "MIT",
+  "logo": "assets/logo.svg",
+  "keywords": [
+    "responsive",
+    "rwd",
+    "playwright",
+    "mobile",
+    "frontend-testing",
+    "ui-audit"
+  ],
+  "suggestedPrompts": [
+    "Run a 9-viewport responsive and crowding audit on my local frontend URL",
+    "Static-scan this project's CSS and HTML for mobile and short-landscape layout pitfalls",
+    "Retrieve testing guidance for dialogs, touch targets, and iOS input zoom on tight screens"
+  ]
+}

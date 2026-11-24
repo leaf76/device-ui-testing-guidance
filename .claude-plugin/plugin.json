@@ -1,0 +1,8 @@
+{
+  "name": "device-ui-testing-guidance",
+  "description": "Structured multi-device frontend testing guidance, CSS/HTML static pitfall scanner, and 9-viewport headless Playwright auditor.",
+  "version": "1.0.0",
+  "author": {
+    "name": "leaf76"
+  }
+}

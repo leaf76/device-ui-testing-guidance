@@ -1,0 +1,64 @@
+{
+  "name": "device-ui-testing-guidance",
+  "displayName": "Device UI Testing Guidance",
+  "version": "1.0.0",
+  "description": "Device adaptation, multi-viewport responsiveness, and real-world frontend UI/UX testing guidance, static scanner, and headless Playwright auditor for coding agents.",
+  "type": "module",
+  "license": "MIT",
+  "author": {
+    "name": "leaf76",
+    "url": "https://github.com/leaf76"
+  },
+  "homepage": "https://github.com/leaf76/device-ui-testing-guidance#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leaf76/device-ui-testing-guidance.git"
+  },
+  "bugs": {
+    "url": "https://github.com/leaf76/device-ui-testing-guidance/issues"
+  },
+  "keywords": [
+    "frontend-testing",
+    "responsive-design",
+    "rwd",
+    "playwright",
+    "mobile-ux",
+    "accessibility",
+    "agent-skill",
+    "coding-agent"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "bin": {
+    "device-ui-testing-guidance": "./bin/device-ui-testing-guidance.mjs"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "skills/",
+    "assets/",
+    "plugin.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "install:local": "node scripts/install-local.mjs"
+  },
+  "peerDependencies": {
+    "playwright": ">=1.40.0"
+  },
+  "peerDependenciesMeta": {
+    "playwright": {
+      "optional": true
+    }
+  },
+  "contributes": {
+    "chatSkills": [
+      {
+        "path": "./skills/device-ui-testing-guidance/SKILL.md"
+      }
+    ]
+  }
+}

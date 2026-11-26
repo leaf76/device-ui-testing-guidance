@@ -265,6 +265,46 @@ const CLEAN_HTML = `<!doctype html>
 </body>
 </html>`;
 
+const BROKEN_FOLD_HTML = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Broken Foldable Fixture</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; }
+    .cover-overflow-card {
+      width: 356px;
+      padding: 12px;
+      background: #dbeafe;
+    }
+    .stale-js-banner {
+      padding: 10px 12px;
+      background: #fef3c7;
+    }
+    .hinge-center-btn {
+      position: fixed;
+      top: 120px;
+      left: calc(50% - 60px);
+      width: 120px;
+      height: 44px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="cover-overflow-card">356px card fits 360px phone but overflows 344px foldable cover screen</div>
+    <div class="stale-js-banner" id="stale-box">Stale JS width measured only on initial load</div>
+    <button type="button" class="hinge-center-btn">Span Hinge</button>
+  </main>
+  <script>
+    const box = document.getElementById("stale-box");
+    box.style.width = window.innerWidth + "px";
+  </script>
+</body>
+</html>`;
+
 function findLocalPlaywrightHint() {
   return process.env.PLAYWRIGHT_PATH || "";
 }
@@ -284,6 +324,9 @@ function startFixtureServer() {
       if (req.url === "/broken") {
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
         res.end(BROKEN_HTML);
+      } else if (req.url === "/broken-fold") {
+        res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+        res.end(BROKEN_FOLD_HTML);
       } else {
         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
         res.end(CLEAN_HTML);
@@ -371,6 +414,120 @@ test(
       const shots = fs.readdirSync(path.join(outDir, "screenshots"));
       assert.ok(shots.some((f) => f.includes("phone-compact-portrait-light.png")));
       assert.ok(shots.some((f) => f.includes("phone-short-landscape-dark-open-modal.png")));
+    } finally {
+      server.close();
+      fs.rmSync(outDir, { recursive: true, force: true });
+    }
+  }
+);
+
+test(
+  "headless Playwright audit catches foldable cover/transition/hinge defects and passes clean all+transitions matrix",
+  { skip: !hasPlaywrightRuntime() ? "No local Playwright runtime installed" : false },
+  async () => {
+    const { server, baseUrl } = await startFixtureServer();
+    const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "dutg-fold-"));
+    const playwrightFrom = findLocalPlaywrightHint();
+
+    try {
+      // 1. Broken foldable fixture flags 356px cover overflow + stale-JS resize transition overflow
+      const brokenFoldReport = await runAudit(`${baseUrl}/broken-fold`, {
+        preset: "foldable",
+        foldTransitions: true,
+        themes: ["light"],
+        playwrightFrom,
+        screenshots: "none",
+        waitMs: 50,
+      });
+
+      const coverRun = brokenFoldReport.runs.find((r) => r.viewport.key === "fold-cover-portrait");
+      assert.ok(coverRun && coverRun.failCount > 0, "Expected 356px card to fail on 344px cover screen");
+      assert.ok(
+        coverRun.checks.some((c) => c.id === "document-overflow" || c.id === "viewport-edge-clipping"),
+        "Expected overflow/clipping check on fold-cover-portrait"
+      );
+
+      const transitionRun = brokenFoldReport.runs.find(
+        (r) => r.viewport.key === "fold-transition-unfolded-landscape-to-cover"
+      );
+      assert.ok(transitionRun, "Expected unfolded-landscape-to-cover transition run");
+      assert.ok(
+        transitionRun.checks.some(
+          (c) => c.phase === "transition:fold-to-cover-portrait" && c.id === "document-overflow"
+        ),
+        `Expected stale-JS width to trigger document-overflow after folding to cover, got: ${JSON.stringify(
+          transitionRun.checks
+        )}`
+      );
+
+      // 2. Half-folded hinge posture flags control centered over vertical hinge
+      const hingeReport = await runAudit(`${baseUrl}/broken-fold`, {
+        viewports: "fold-half-book",
+        themes: ["light"],
+        playwrightFrom,
+        screenshots: "none",
+        waitMs: 50,
+      });
+      const hingeRun = hingeReport.runs[0];
+      assert.ok(
+        hingeRun.checks.some((c) => c.id === "fold-hinge-obstruction"),
+        `Expected fold-hinge-obstruction on fold-half-book, got: ${JSON.stringify(hingeRun.checks)}`
+      );
+
+      // 3. Clean fixture passes all 14 viewports + 2 live transitions (16 runs) with 0 FAIL and 0 WARN
+      const cleanFoldReport = await runAudit(`${baseUrl}/clean`, {
+        preset: "all",
+        foldTransitions: true,
+        themes: ["light"],
+        primarySelector: "main",
+        outDir,
+        screenshots: "flagged",
+        playwrightFrom,
+        waitMs: 50,
+      });
+
+      assert.equal(cleanFoldReport.summary.viewportsRun, 14);
+      assert.equal(cleanFoldReport.summary.transitionsRun, 2);
+      assert.equal(cleanFoldReport.summary.totalRuns, 16);
+      assert.equal(
+        cleanFoldReport.summary.fail,
+        0,
+        `Expected 0 FAIL on clean all+transitions fixture: ${JSON.stringify(
+          cleanFoldReport.runs.filter((r) => r.failCount > 0),
+          null,
+          2
+        )}`
+      );
+      assert.equal(
+        cleanFoldReport.summary.warn,
+        0,
+        `Expected 0 WARN on clean all+transitions fixture: ${JSON.stringify(
+          cleanFoldReport.runs.filter((r) => r.warnCount > 0),
+          null,
+          2
+        )}`
+      );
+
+      // 4. Interactive resize action sequence (open modal on cover -> unfold -> refold -> Escape) passes with 0 FAIL
+      const interactiveFoldReport = await runAudit(`${baseUrl}/clean`, {
+        viewports: "fold-cover-portrait",
+        themes: ["light"],
+        primarySelector: "main",
+        playwrightFrom,
+        screenshots: "none",
+        waitMs: 50,
+        actions: [
+          { name: "open-modal", type: "click", selector: "#open-clean-dialog", audit: true },
+          { name: "unfold-modal", type: "resize", width: 712, height: 776, audit: true },
+          { name: "refold-modal", type: "resize", width: 344, height: 882, audit: true },
+          { name: "close-modal", type: "press", key: "Escape", audit: true },
+        ],
+      });
+      assert.equal(
+        interactiveFoldReport.summary.fail,
+        0,
+        `Expected 0 FAIL on interactive fold resize actions: ${JSON.stringify(interactiveFoldReport.runs, null, 2)}`
+      );
     } finally {
       server.close();
       fs.rmSync(outDir, { recursive: true, force: true });

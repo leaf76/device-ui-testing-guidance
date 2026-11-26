@@ -2,8 +2,8 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "device-ui-testing-guidance",
   "displayName": "Device UI Testing Guidance",
-  "version": "1.0.0",
-  "description": "Structured multi-device frontend testing guidance, CSS/HTML static pitfall scanner, and 9-viewport headless Playwright auditor for real-world responsive UI/UX verification.",
+  "version": "1.1.0",
+  "description": "Structured multi-device frontend testing guidance, CSS/HTML static pitfall scanner, and multi-viewport (including foldable cover, unfolded, and transition) headless Playwright auditor for real-world responsive UI/UX verification.",
   "author": {
     "name": "leaf76",
     "url": "https://github.com/leaf76"
@@ -17,6 +17,7 @@
     "rwd",
     "playwright",
     "mobile",
+    "foldable",
     "frontend-testing",
     "ui-audit"
   ],

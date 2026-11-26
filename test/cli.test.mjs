@@ -1,9 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { PACKAGE_ROOT } from "../lib/guides.mjs";
+import { resolveViewports } from "../lib/viewports.mjs";
+import { installLocal } from "../scripts/install-local.mjs";
 
 const CLI = path.join(PACKAGE_ROOT, "bin", "device-ui-testing-guidance.mjs");
 
@@ -19,7 +22,7 @@ test("CLI --version and list --json work cleanly", () => {
   assert.match(version, /^\d+\.\d+\.\d+$/);
 
   const list = JSON.parse(runCli(["list", "--json"]));
-  assert.equal(list.length, 24);
+  assert.equal(list.length, 26);
 });
 
 test("CLI search ranks expected guides including domain synonyms", () => {
@@ -29,6 +32,8 @@ test("CLI search ranks expected guides including domain synonyms", () => {
     ["rwd viewport matrix", "responsive-viewport-matrix"],
     ["bilingual cjk english truncation", "bilingual-cjk-latin-expansion"],
     ["body overflow-x hidden band-aid", "zero-overflow-and-clipping-scan"],
+    ["foldable cover unfolded screen", "foldable-cover-and-unfolded-screens"],
+    ["fold hinge posture segments", "foldable-transitions-and-hinge-posture"],
   ];
 
   for (const [query, expectedId] of cases) {
@@ -64,4 +69,38 @@ test("CLI retrieve exits non-zero on unknown guide ID", () => {
     () => runCli(["retrieve", "non-existent-guide-xyz"]),
     (err) => err.status === 1
   );
+});
+
+test("resolveViewports resolves foldable, foldable-hinge, and all presets", () => {
+  const foldable = resolveViewports({ preset: "foldable" });
+  assert.equal(foldable.length, 5);
+  assert.ok(foldable.some((v) => v.key === "fold-cover-portrait" && v.width === 344));
+  assert.ok(foldable.some((v) => v.key === "fold-unfolded-portrait" && v.width === 712));
+  assert.ok(foldable.some((v) => v.key === "flip-cover" && v.width === 360 && v.height === 374));
+
+  const hinge = resolveViewports({ preset: "foldable-hinge" });
+  assert.equal(hinge.length, 7);
+  assert.ok(hinge.some((v) => v.key === "fold-half-book" && v.displayFeature?.orientation === "vertical"));
+  assert.ok(hinge.some((v) => v.key === "fold-half-tabletop" && v.displayFeature?.orientation === "horizontal"));
+
+  const all = resolveViewports({ preset: "all" });
+  assert.equal(all.length, 14);
+});
+
+test("installLocal preserves Syncthing .stfolder and .stignore markers", () => {
+  const tmpTarget = fs.mkdtempSync(path.join(os.tmpdir(), "dutg-install-"));
+  try {
+    fs.mkdirSync(path.join(tmpTarget, ".stfolder"), { recursive: true });
+    fs.writeFileSync(path.join(tmpTarget, ".stignore"), "node_modules\n", "utf8");
+    fs.writeFileSync(path.join(tmpTarget, "stale-old-file.txt"), "remove-me", "utf8");
+
+    installLocal(tmpTarget);
+
+    assert.ok(fs.existsSync(path.join(tmpTarget, ".stfolder")));
+    assert.equal(fs.readFileSync(path.join(tmpTarget, ".stignore"), "utf8"), "node_modules\n");
+    assert.ok(!fs.existsSync(path.join(tmpTarget, "stale-old-file.txt")));
+    assert.ok(fs.existsSync(path.join(tmpTarget, "bin", "device-ui-testing-guidance.mjs")));
+  } finally {
+    fs.rmSync(tmpTarget, { recursive: true, force: true });
+  }
 });

@@ -25,6 +25,8 @@ appliesTo: [playwright, execution, testing]
 | Open `<dialog>` / `[popover]` bounds | Any edge outside `[-1, vw+1.5]` / `[-1, vh+1.5]` or inner `scrollWidth > clientWidth + 1` | — | Check in both portrait & `667x375` short landscape |
 | Above-the-fold primary budget | — | Primary surface starts below `45%` of `innerHeight` or has `< 180px` visible on short screens | Pass `--primary-selector` for dense apps |
 | `[hidden]` attribute leak | Any `[hidden]` node with `display !== "none"` | — | Catches `display: flex\|grid` overriding `[hidden]` |
+| Foldable hinge obstruction | — | Interactive control or open modal overlaps half-folded hinge band | Evaluated on `fold-half-book` / `fold-half-tabletop` (`--preset foldable-hinge`) |
+| Live fold/unfold transition | Any FAIL geometry/JS error after same-session resize | Any WARN after same-session resize | Enabled automatically with `--preset foldable` or `--fold-transitions` |
 
 - **DO** mark intentional horizontal carousels, chip strips, and scrollable code/table wrappers with `data-scroll-strip` so audits separate intentional horizontal scrolling from accidental overflow.
 - **DON'T** weaken thresholds globally to silence one broken component — fix the CSS or explicitly scope the exemption.
@@ -51,4 +53,5 @@ node bin/device-ui-testing-guidance.mjs audit http://127.0.0.1:4173 \
 - `zero-overflow-and-clipping-scan`
 - `toolbar-crowding-and-overlap-audit`
 - `touch-targets-and-coarse-pointer`
+- `foldable-transitions-and-hinge-posture`
 - `visual-screenshot-triage-workflow`

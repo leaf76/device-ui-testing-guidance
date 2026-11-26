@@ -2,7 +2,7 @@
 name: device-ui-testing-guidance
 description: |
   Device adaptation, multi-viewport responsiveness, and real-world frontend UI/UX testing guidance, static CSS/HTML pitfall scanner, and headless Playwright auditor.
-  Trigger whenever verifying, auditing, or fixing responsive layouts, mobile/tablet/landscape/split-screen adaptation, dialogs/drawers/popovers/tables, touch targets, iOS input zoom, bilingual/long-string overflow, dark/light themes, 200% zoom, or Playwright UI checks.
+  Trigger whenever verifying, auditing, or fixing responsive layouts, mobile/tablet/foldable (cover + unfolded)/landscape/split-screen adaptation, dialogs/drawers/popovers/tables, touch targets, iOS input zoom, bilingual/long-string overflow, dark/light themes, 200% zoom, or Playwright UI checks.
   DO NOT trigger for backend-only API/SQL/worker logic, pure unit tests without DOM/CSS, infra/CI scripts, or copy-only docs edits.
 ---
 
@@ -55,7 +55,7 @@ If combined output exceeds `9.5 KB`, the CLI writes it to a temporary file and p
    ```
    Verify every finding against its `keepWhen` / `dropWhen` rubric before changing code; ignore verified false positives.
 
-2. **Live Headless Playwright Audit** (9-viewport matrix by default, never `--headed`, never steals OS focus):
+2. **Live Headless Playwright Audit** (9-viewport matrix by default; use `--preset foldable`, `--preset foldable-hinge`, or `--preset all` + `--fold-transitions` to include foldable cover/unfolded screens and live fold↔unfold checks; never `--headed`, never steals OS focus):
    ```sh
    node "<plugin-root>/bin/device-ui-testing-guidance.mjs" audit <url> \
      --preset full \
@@ -63,8 +63,9 @@ If combined output exceeds `9.5 KB`, the CLI writes it to a temporary file and p
      --out <scratch-or-audit-dir> \
      --json
    ```
+   - Use `--preset all --fold-transitions` when auditing foldable cover (`344x882`, `882x344`, `360x374`), unfolded (`712x776`, `776x712`), and live open↔close transitions alongside the 9 standard viewports (or `--preset foldable-hinge` for half-folded hinge posture checks).
    - Pass `--playwright-from <path-to-project-or-package.json>` (or set `PLAYWRIGHT_PATH`) if the target repository does not install `playwright` locally.
-   - Pass `--actions <actions.json>` to exercise interactive modals, drawers, tabs, dropdowns, and `Escape` dismissal across viewports.
+   - Pass `--actions <actions.json>` to exercise interactive modals, drawers, tabs, dropdowns, live `resize` steps, and `Escape` dismissal across viewports.
    - Pass `--primary-selector "<css>"` to enforce above-the-fold primary content height budgets on tight screens (`360x640`, `667x375`).
    - Seed **realistic dense / adversarial fixtures** (55+ char slugs/emails/UUIDs, 90+ char URLs, populated lists, EN + ZH/target locales) before judging pass/fail.
 
@@ -84,4 +85,5 @@ DOM geometry checks catch objective regressions, but **cannot replace visual ins
 - **Always emulate touch on mobile/tablet viewports**: Use `isMobile: true, hasTouch: true` so `@media (pointer: coarse)` rules actually activate.
 - **Protect portrait virtual keyboards**: Never write bare `@media (orientation: landscape)` for phone multi-column layouts without pairing `max-height: 500px` and `min-width: 560px`.
 - **Keep mobile inputs zoom-safe**: Every interactive `<input>`, `<select>`, and `<textarea>` on mobile MUST compute to `font-size >= 16px` (check higher-specificity class overrides too).
+- **Verify foldable cover + unfolded continuity**: Never treat `360x640` or `768x1024` as sufficient for foldables; narrow cover screens (`344x882`, `360x374`) and near-square unfolded inner screens (`712x776`, `776x712`) must remain touch-safe and survive live same-session resize without stale JS widths.
 - **Headless & zero focus stealing**: Always launch `headless: true` (`channel: "chrome"`, fallback `"msedge"` or bundled Chromium). Never steal desktop focus.

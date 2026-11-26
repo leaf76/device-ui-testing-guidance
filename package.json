@@ -1,8 +1,8 @@
 {
   "name": "device-ui-testing-guidance",
   "displayName": "Device UI Testing Guidance",
-  "version": "1.0.0",
-  "description": "Device adaptation, multi-viewport responsiveness, and real-world frontend UI/UX testing guidance, static scanner, and headless Playwright auditor for coding agents.",
+  "version": "1.1.0",
+  "description": "Device adaptation, multi-viewport responsiveness (including foldable cover and unfolded screens), and real-world frontend UI/UX testing guidance, static scanner, and headless Playwright auditor for coding agents.",
   "type": "module",
   "license": "MIT",
   "author": {
@@ -23,6 +23,7 @@
     "rwd",
     "playwright",
     "mobile-ux",
+    "foldable",
     "accessibility",
     "agent-skill",
     "coding-agent"

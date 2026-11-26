@@ -58,7 +58,9 @@ Usage:
 
 Audit Options:
   --preset <name>             Viewport preset: ${Object.keys(PRESET_KEYS).join(", ")} (default: full)
-  --viewports <spec>          Custom comma list, e.g. "360x640,667x375:touch,1280x800:desktop"
+  --viewports <spec>          Custom comma list, e.g. "360x640,667x375:touch,fold-cover-portrait,1280x800:desktop"
+  --fold-transitions          Run live same-session cover <-> unfolded resize checks (auto-on for foldable presets)
+  --no-fold-transitions       Disable live fold/unfold transition checks even on foldable presets
   --themes <list>             Comma list of color schemes: light,dark (default: light)
   --locale <bcp47>            Browser locale (default: en-US)
   --reduced-motion <mode>     no-preference | reduce (default: no-preference)
@@ -222,9 +224,17 @@ async function cmdAudit(positionals, flags) {
     }
   }
 
+  const preset = flags.preset ? String(flags.preset) : "full";
+  const foldTransitions = flags["no-fold-transitions"]
+    ? false
+    : flags["fold-transitions"]
+      ? true
+      : !flags.viewports && (preset === "foldable" || preset === "foldable-hinge");
+
   const report = await runAudit(url, {
-    preset: flags.preset ? String(flags.preset) : "full",
+    preset,
     viewports: flags.viewports ? String(flags.viewports) : "",
+    foldTransitions,
     themes: flags.themes ? String(flags.themes) : "light",
     locale: flags.locale ? String(flags.locale) : "en-US",
     reducedMotion: flags["reduced-motion"] ? String(flags["reduced-motion"]) : "no-preference",

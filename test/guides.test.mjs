@@ -2,12 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { loadGuides, listCategories } from "../lib/guides.mjs";
 
-test("corpus contains 24 well-formed guides across 6 categories with valid cross-references", () => {
+test("corpus contains 26 well-formed guides across 6 categories with valid cross-references", () => {
   const guides = loadGuides({ fresh: true });
   const cats = listCategories(guides);
 
   assert.equal(cats.length, 6, `Expected 6 categories, found ${cats.length}`);
-  assert.equal(guides.length, 24, `Expected 24 guides, found ${guides.length}`);
+  assert.equal(guides.length, 26, `Expected 26 guides, found ${guides.length}`);
 
   const ids = new Set();
   for (const g of guides) {

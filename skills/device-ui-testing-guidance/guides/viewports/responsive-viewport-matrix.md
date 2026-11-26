@@ -22,6 +22,7 @@ appliesTo: [playwright, css, rwd]
   8. `1280x800` — Standard laptop (`isMobile: false, hasTouch: false`)
   9. `1440x900` — Desktop widescreen (`isMobile: false, hasTouch: false`)
 - **DO** add an optional ultrawide check (`1920x1080`) for data-dense dashboards or multi-column tables to verify `max-width` readability.
+- **DO** include foldable cover (`344x882`, `882x344`, `360x374`) and unfolded (`712x776`, `776x712`) checks via `--preset foldable` or `--preset all` (14 viewports) whenever supporting foldable devices.
 - **DON'T** reuse a single browser context across mobile and desktop viewports by only calling `page.setViewportSize()`; `@media (pointer: coarse)` and `hover: none` require a fresh context with `isMobile` and `hasTouch`.
 
 ## Common Failure Modes
@@ -60,5 +61,7 @@ for (const vp of MATRIX) {
 
 - `short-landscape-and-keyboard-guard`
 - `split-screen-and-tablet-breakpoints`
+- `foldable-cover-and-unfolded-screens`
+- `foldable-transitions-and-hinge-posture`
 - `headless-playwright-runner-contract`
 - `geometry-assertions-and-severity-rubric`

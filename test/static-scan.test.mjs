@@ -9,7 +9,7 @@ function makeTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 
-test("static-scan detects all 10 anti-pattern rules on a deliberately flawed fixture", () => {
+test("static-scan detects all 12 anti-pattern rules on a deliberately flawed fixture", () => {
   const dir = makeTempDir("dutg-bad-");
   try {
     fs.writeFileSync(
@@ -38,7 +38,7 @@ body {
   min-height: 100vh;
 }
 .wide-card {
-  width: 520px;
+  width: 356px;
 }
 .hero-title {
   font-size: 6vw;
@@ -49,8 +49,14 @@ body {
 .row:hover .row-actions {
   opacity: 1;
 }
+.split-pane {
+  width: env(viewport-segment-width 0 0);
+}
 @media (orientation: landscape) {
   .grid { grid-template-columns: 1fr 1fr; }
+}
+@media (screen-spanning: single-fold-vertical) {
+  .legacy-pane { left: env(fold-left); }
 }
 `,
       "utf8"
@@ -132,6 +138,12 @@ input, select, textarea {
 }
 @media (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
   .grid { grid-template-columns: 1fr 1fr; }
+}
+.safe-seg {
+  width: env(viewport-segment-width 0 0, 50%);
+}
+@media (horizontal-viewport-segments: 2) {
+  .seg-pane { width: env(viewport-segment-width 0 0); }
 }
 `,
       "utf8"
